@@ -6,7 +6,7 @@ package com.tingco.codechallenge.elevator.api;
  * @author Sven Wesley
  *
  */
-interface Elevator {
+public interface Elevator {
 
     /**
      * Enumeration for describing elevator's direction.
@@ -14,7 +14,15 @@ interface Elevator {
     enum Direction {
         UP, DOWN, NONE
     }
+    /**
+     * Enumeration for describing elevator's state.
+     */
+    enum State {
+        MOVING_UP, MOVING_DOWN,IDLE,OCCUPIED
+    }
+    State getState();
 
+    void setState(State newState);
     /**
      * Tells which direction is the elevator going in.
      *
