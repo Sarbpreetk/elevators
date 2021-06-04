@@ -1,5 +1,6 @@
 package com.tingco.codechallenge.elevator.api.impl;
 
+import com.google.common.eventbus.EventBus;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
 import org.apache.log4j.Logger;
@@ -33,6 +34,9 @@ public class ElevatorControllerImpl implements ElevatorController {
     @Autowired
     private Executor executor;
 
+    @Autowired
+    private EventBus eventBus;
+
 
     @Override
     public Elevator requestElevator(int toFloor) {
@@ -58,7 +62,7 @@ public class ElevatorControllerImpl implements ElevatorController {
     @PostConstruct
     public void initializeElevators(){
         for(int i=0;i<numberOfElevators;i++){
-            ElevatorImpl elevator= new ElevatorImpl(i);
+            ElevatorImpl elevator= new ElevatorImpl(i,eventBus);
             executor.execute(elevator);
             elevators.add(elevator);
 
@@ -73,6 +77,7 @@ public class ElevatorControllerImpl implements ElevatorController {
 
     @Override
     public void releaseElevator(Elevator elevator) {
-
+        elevator.setState(Elevator.State.IDLE);
+        eventBus.post(elevator);
     }
 }
