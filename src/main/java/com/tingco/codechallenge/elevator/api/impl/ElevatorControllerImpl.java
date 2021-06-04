@@ -15,11 +15,11 @@ import java.util.concurrent.Executor;
 
 @Service
 public class ElevatorControllerImpl implements ElevatorController {
-    @Value("${elevator.minFloor}")
-    private int minFloor;
+    @Value("${com.tingco.elevator.startFloor}")
+    private int startFoor;
 
-    @Value("${elevator.maxFloor}")
-    private int maxFloor;
+    @Value("${com.tingco.elevator.endFloor}")
+    private int endFloor;
 
     @Value("${com.tingco.elevator.numberofelevators}")
     private int numberOfElevators;
@@ -29,6 +29,7 @@ public class ElevatorControllerImpl implements ElevatorController {
     private Queue<Integer> waitingPersons = new LinkedList<>();
     @Autowired
     private Executor executor;
+
 
 
     @Override

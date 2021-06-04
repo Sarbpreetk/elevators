@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 public class ElevatorImpl implements Elevator, Runnable {
     private int id;
     private int currFloor;
-    private int minFloor;
-    private int maxFloor;
+    private int startFloor;
+    private int endFloor;
     private Direction direction;
     private State state;
     private int destFloor;
@@ -79,6 +79,9 @@ public class ElevatorImpl implements Elevator, Runnable {
 
     @Override
     public void run() {
+       move();
+    }
+    public void move(){
         System.out.println("READY");
         if(direction.equals(Direction.UP)){
             currFloor++;
