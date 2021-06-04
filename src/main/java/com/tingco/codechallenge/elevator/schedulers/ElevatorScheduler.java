@@ -20,7 +20,7 @@ public class ElevatorScheduler {
     private Queue<ElevatorRequest> waitingPersons = new LinkedList<>();
 
     Scanner scan = new Scanner(System.in);
-
+    @Scheduled(fixedRate = 1000)
     public void useElevator(){
         ElevatorRequest request = new ElevatorRequest();
         System.out.println("Enter current floor");

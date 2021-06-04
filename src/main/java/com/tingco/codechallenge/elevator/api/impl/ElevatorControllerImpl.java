@@ -1,18 +1,21 @@
 package com.tingco.codechallenge.elevator.api.impl;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.Executor;
 
-
+@EnableScheduling
 @Service
 public class ElevatorControllerImpl implements ElevatorController {
 
@@ -39,13 +42,16 @@ public class ElevatorControllerImpl implements ElevatorController {
 
 
     @Override
-    public Elevator requestElevator(int toFloor) {
+    public synchronized Elevator requestElevator(int toFloor) {
         logger.info("Received Request for Floor: "+ toFloor);
         Elevator nearest =null;
         for(int i=0;i<numberOfElevators;i++){
             Elevator current = elevators.get(i);
             if(current.getState().equals(Elevator.State.IDLE)){
-                nearest=current;
+                if(nearest==null){
+                    nearest =current;
+                    continue;
+                }
                 if(Math.abs(nearest.currentFloor()-toFloor)>Math.abs(current.currentFloor()-toFloor)){
                     nearest =current;
                 }
@@ -53,16 +59,31 @@ public class ElevatorControllerImpl implements ElevatorController {
         }
         if(nearest !=null) {
             nearest.setState(Elevator.State.OCCUPIED);
+            nearest.moveElevator(toFloor);
             System.out.println("Nearest Elevator is" + nearest.getId());
             logger.info("Sending Elevator : "+ nearest.getId());
+        } else {
+            waitingPersons.add(toFloor);
         }
 
         return nearest;
     }
+
+    @Scheduled(fixedRate = 1000)
+    public void getFromQueue(){
+        if(!waitingPersons.isEmpty()){
+           int reqFloor= waitingPersons.poll();
+            logger.info("Requesting for waiting person: "+ reqFloor);
+           requestElevator(reqFloor);
+        }
+    }
+
+
     @PostConstruct
     public void initializeElevators(){
         for(int i=0;i<numberOfElevators;i++){
             ElevatorImpl elevator= new ElevatorImpl(i,eventBus);
+            eventBus.register(elevator);
             executor.execute(elevator);
             elevators.add(elevator);
 
@@ -76,8 +97,15 @@ public class ElevatorControllerImpl implements ElevatorController {
     }
 
     @Override
-    public void releaseElevator(Elevator elevator) {
+    public synchronized void releaseElevator(Elevator elevator) {
+        logger.info("in releaseElevator");
         elevator.setState(Elevator.State.IDLE);
         eventBus.post(elevator);
+        System.out.println("Posted Event");
+    }
+
+    @Subscribe
+    public void receiveEvent(Elevator elevator){
+        System.out.println("received Event");
     }
 }
