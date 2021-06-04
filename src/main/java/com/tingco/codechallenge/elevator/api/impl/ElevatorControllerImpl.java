@@ -2,19 +2,21 @@ package com.tingco.codechallenge.elevator.api.impl;
 
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.Executor;
+
 
 @Service
 public class ElevatorControllerImpl implements ElevatorController {
+
+    private static final Logger logger = Logger.getLogger(ElevatorControllerImpl.class);
+
     @Value("${com.tingco.elevator.startFloor}")
     private int startFoor;
 
@@ -27,13 +29,14 @@ public class ElevatorControllerImpl implements ElevatorController {
 
     private List<Elevator> elevators = new ArrayList<>();
     private Queue<Integer> waitingPersons = new LinkedList<>();
+
     @Autowired
     private Executor executor;
 
 
-
     @Override
     public Elevator requestElevator(int toFloor) {
+        logger.info("Received Request for Floor: "+ toFloor);
         Elevator nearest =null;
         for(int i=0;i<numberOfElevators;i++){
             Elevator current = elevators.get(i);
@@ -47,6 +50,7 @@ public class ElevatorControllerImpl implements ElevatorController {
         if(nearest !=null) {
             nearest.setState(Elevator.State.OCCUPIED);
             System.out.println("Nearest Elevator is" + nearest.getId());
+            logger.info("Sending Elevator : "+ nearest.getId());
         }
 
         return nearest;
@@ -57,13 +61,14 @@ public class ElevatorControllerImpl implements ElevatorController {
             ElevatorImpl elevator= new ElevatorImpl(i);
             executor.execute(elevator);
             elevators.add(elevator);
-           System.out.println(elevators.size());
+
         }
 
     }
     @Override
     public List<Elevator> getElevators() {
-        return elevators;
+        logger.info("Returning List of Elevators");
+        return Collections.unmodifiableList(elevators);
     }
 
     @Override
