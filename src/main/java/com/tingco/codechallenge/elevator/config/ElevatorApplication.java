@@ -62,6 +62,11 @@ public class ElevatorApplication {
 
         return new AsyncEventBus(Executors.newCachedThreadPool());
     }
+
+    /**
+     * For Swagger UI
+     * @return
+     */
     @Bean
     public Docket productApi() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -69,16 +74,5 @@ public class ElevatorApplication {
                 .build();
     }
 
-    private ApiInfo metaData() {
-        ApiInfo apiInfo = new ApiInfo(
-                "Elevator API",
-                "",
-                "1.0",
-                "Terms of service",
-                new Contact("Skaur", "", ""),
-                "Protected for Sarbpreetk",
-                "https://");
-        return apiInfo;
-    }
 
 }

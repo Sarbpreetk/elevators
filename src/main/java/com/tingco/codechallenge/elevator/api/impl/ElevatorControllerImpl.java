@@ -41,64 +41,62 @@ public class ElevatorControllerImpl implements ElevatorController {
      * Initialize all elevators
      */
     @PostConstruct
-    public void initializeElevators(){
-        for(int i=0;i<numberOfElevators;i++){
-            ElevatorImpl elevator= new ElevatorImpl(i,eventBus);
+    public void initializeElevators() {
+        for (int i = 0; i < numberOfElevators; i++) {
+            ElevatorImpl elevator = new ElevatorImpl(i, eventBus);
             executor.execute(elevator);
             elevators.add(elevator);
 
         }
     }
 
-
     @Override
     public synchronized Elevator requestElevator(int toFloor) {
-        logger.info("Received Request for Floor: "+ toFloor);
-        Elevator nearest =null;
-        for(Elevator current : elevators){
-            if(!current.isBusy()){
-                if(nearest == null){
+        logger.info("Received Request for Floor: " + toFloor);
+        Elevator nearest = null;
+        for (Elevator current : elevators) {
+            if (!current.isBusy()) {
+                if (nearest == null) {
                     nearest = current;
                     continue;
                 }
-                int nearestDistance = Math.abs(nearest.getCurrentFloor()-toFloor);
-                int currentDistance = Math.abs(current.getCurrentFloor()-toFloor);
-                if(nearestDistance > currentDistance){
+                int nearestDistance = Math.abs(nearest.getCurrentFloor() - toFloor);
+                int currentDistance = Math.abs(current.getCurrentFloor() - toFloor);
+                if (nearestDistance > currentDistance) {
                     nearest = current;
                 }
             }
         }
-        if(nearest != null) {
-            logger.info("Sending Elevator : "+ nearest.getId());
-            ElevatorEvent event = new ElevatorEvent(nearest.getId(),toFloor, EventType.ASSIGN);
+        if (nearest != null) {
+            logger.info("Sending Elevator : " + nearest.getId());
+            ElevatorEvent event = new ElevatorEvent(nearest.getId(), toFloor, EventType.ASSIGN);
             eventBus.post(event);
         } else {
-            if(!waitingPersons.contains(toFloor))
-                logger.info("ADD TO WAITING QUEUE - floor : "+ toFloor);
-                waitingPersons.add(toFloor);
+            if (!waitingPersons.contains(toFloor))
+                logger.info("ADD TO WAITING QUEUE - floor : " + toFloor);
+            waitingPersons.add(toFloor);
         }
         return nearest;
     }
 
-    public void takeElevator(int id, int destFloor){
-       //TODO: Take given elevator id to destination floor
+    public void takeElevator(int id, int destFloor) {
+        //TODO: Take given elevator id to destination floor
     }
 
     /**
      * Scheduled Method to request Elevator for persons waiting in Queue
      */
     @Scheduled(fixedRate = 1000)
-    public void getFromQueue(){
-        if(!waitingPersons.isEmpty()){
-           int reqFloor= waitingPersons.peek();
-           logger.info("Requesting for waiting person at floor : "+ reqFloor);
-           Elevator elevator = requestElevator(reqFloor);
-           if(elevator!=null){
-               waitingPersons.poll();
-           }
+    public void getFromQueue() {
+        if (!waitingPersons.isEmpty()) {
+            int reqFloor = waitingPersons.peek();
+            logger.info("Requesting for waiting person at floor : " + reqFloor);
+            Elevator elevator = requestElevator(reqFloor);
+            if (elevator != null) {
+                waitingPersons.poll();
+            }
         }
     }
-
 
 
     @Override

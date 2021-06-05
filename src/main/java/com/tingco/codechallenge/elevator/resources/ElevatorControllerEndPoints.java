@@ -3,6 +3,8 @@ package com.tingco.codechallenge.elevator.resources;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
 import com.tingco.codechallenge.elevator.api.util.ValidationUtil;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ public final class ElevatorControllerEndPoints {
 
     @Autowired
     ElevatorController controller;
+
     @Autowired
     ValidationUtil util;
 
@@ -53,7 +56,10 @@ public final class ElevatorControllerEndPoints {
      * @return
      */
     @ApiOperation(value = "Request Elevator", notes = "This method places request for elevator to given floor")
-    @RequestMapping(value = "/elevator", method = RequestMethod.GET)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "toFloor", value = "request an elevator to the floor (example - any number between 0 to 30)", required = true, dataType = "int", paramType = "query", defaultValue = "0")
+    })
+    @RequestMapping(value = "/elevator", method = RequestMethod.POST)
     public Object requestElevator(@RequestParam(required = true) Integer toFloor) {
         if(!util.validateFloor(toFloor)){
             logger.error("Input Floor is invalid");
@@ -73,7 +79,10 @@ public final class ElevatorControllerEndPoints {
      * @return
      */
     @ApiOperation(value = "Release a elevator", notes = "This method will release elevator with given id.")
-    @RequestMapping(value = "/release", method = RequestMethod.GET)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "elevator id (example - any number between 0 to 5)", required = true, dataType = "int", paramType = "query", defaultValue = "0")
+    })
+    @RequestMapping(value = "/release", method = RequestMethod.POST)
     public ResponseEntity<String> releaseElevator(@RequestParam(required = true) Integer id) {
         if(!util.validateId(id)){
             logger.error("Elevator Id is invalid");
