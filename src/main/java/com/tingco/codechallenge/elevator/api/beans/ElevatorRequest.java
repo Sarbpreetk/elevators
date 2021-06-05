@@ -4,6 +4,7 @@ public class ElevatorRequest {
     private int currFloor;
     private int destFloor;
 
+
     public int getCurrFloor() {
         return currFloor;
     }
