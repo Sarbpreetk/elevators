@@ -1,3 +1,40 @@
+
+#Elevator Solution
+¤Description:
+The two interfaces Elevator and ElevatorController have been implemented at com.tingco.codechallenge.elevator.api.impl
+ElevatorControllerImpl - This class is responsible for instantiating the elevators. 
+The request and release of elevator is event based and uses Guava EventBus.
+If no elevator is available the waiting requests are added to a Queue.
+A scheduled method getFromQueue retries to get elevator.
+
+ElevatorImpl - This class is responsble to move the elevator and update Direction/State of the elevator. 
+It subscribes events of type ElevatorEvent.
+
+ElevatorControllerEndPoints - This class contains elevator endpoints
+GET /elevators - To get all elevators
+POST /elevator - To request a elevator
+POST /release - To release elevator
+
+#Configuration settings:
+application.properties - contains the number of floors, start and end floor.
+
+¤Assumption:
+All elevator to go all floors.
+
+¤How to access endpoints
+Swagger UI:
+http://localhost:8080/swagger-ui.html#/elevator-controller-end-points
+
+
+¤Build And Run
+As the project is, the Spring app can be started as seen below.
+build and run the code with Maven
+mvn package
+mvn spring-boot:run
+
+¤Test Cases:
+IntegrationTest
+
 # Elevator Coding Challenge
 
 Create an elevator controller!
