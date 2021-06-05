@@ -1,6 +1,6 @@
 
-#Elevator Solution
-¤Description:
+#Elevator Solution Description:
+
 The two interfaces Elevator and ElevatorController have been implemented at com.tingco.codechallenge.elevator.api.impl
 ElevatorControllerImpl - This class is responsible for instantiating the elevators. 
 The request and release of elevator is event based and uses Guava EventBus.
