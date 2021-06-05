@@ -1,7 +1,6 @@
 package com.tingco.codechallenge.elevator.api.impl;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
 import com.tingco.codechallenge.elevator.api.beans.ElevatorEvent;
