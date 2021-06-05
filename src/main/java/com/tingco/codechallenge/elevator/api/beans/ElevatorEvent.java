@@ -1,28 +1,29 @@
 package com.tingco.codechallenge.elevator.api.beans;
 
 public class ElevatorEvent {
-    private int id;
-    private State state;
-    /**
-     * Enumeration for describing elevator's state.
-     */
-    enum State {
-        MOVING_UP, MOVING_DOWN,IDLE,OCCUPIED
+    private int elevatorId;
+    private int destFloor;
+    private EventType eventType;
+
+    public ElevatorEvent(int elevatorId, EventType eventType) {
+        this.elevatorId = elevatorId;
+        this.eventType = eventType;
+    }
+    public ElevatorEvent(int elevatorId,int destFloor, EventType eventType) {
+        this.elevatorId = elevatorId;
+        this.eventType = eventType;
+        this.destFloor=destFloor;
     }
 
-    public int getId() {
-        return id;
+    public int getElevatorId() {
+        return elevatorId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public EventType getEventType() {
+        return eventType;
     }
 
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
+    public int getDestFloor() {
+        return destFloor;
     }
 }

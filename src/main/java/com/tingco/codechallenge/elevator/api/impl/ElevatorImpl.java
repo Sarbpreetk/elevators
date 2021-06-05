@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service;
 public class ElevatorImpl implements Elevator, Runnable {
 
     private static final Logger logger = Logger.getLogger(ElevatorImpl.class);
+    private static final int MOVE_TIME =2000;
     private int id;
-    private int currFloor;
-    private int startFloor;
-    private int endFloor;
+    private int currentFloor;
     private Direction direction;
     private State state;
-    private int destFloor;
+    private int addressedFloor;
+
 
     @Autowired
     private EventBus eventBus;
@@ -39,20 +39,22 @@ public class ElevatorImpl implements Elevator, Runnable {
         return state;
     }
 
-    @Override
-    public void setState(State newState) {
-        this.state = newState;
-    }
 
     @Override
     public Direction getDirection() {
-
+        if(currentFloor ==addressedFloor) return Direction.NONE;
+        direction = currentFloor < addressedFloor ? Direction.UP : Direction.DOWN;
         return direction;
     }
 
     @Override
     public int getAddressedFloor() {
-        return currFloor;
+        return addressedFloor;
+    }
+
+    @Override
+    public int getCurrentFloor() {
+        return currentFloor;
     }
 
     @Override
@@ -60,28 +62,51 @@ public class ElevatorImpl implements Elevator, Runnable {
         return id;
     }
 
+    /**
+     * Moves elevator to the given floor.
+     * @param toFloor
+     */
     @Override
     public void moveElevator(int toFloor) {
-        if (currFloor < toFloor) {
+        if (currentFloor < toFloor) {
             this.direction = Direction.UP;
             this.state = State.MOVING_UP;
-            while(currFloor < toFloor){
-                logger.info(String.format("Elevator [%s]  going up to floor [%s] from [%s] ", id, toFloor, currFloor));
-                currFloor++;
+            while(currentFloor < toFloor){
+                logger.info(String.format("Elevator [%s]  going up to floor [%s] from [%s] ", id, toFloor, currentFloor));
+                delay();
+                currentFloor++;
             }
         } else {
             this.direction = Direction.DOWN;
             this.state = State.MOVING_DOWN;
-            while(currFloor < toFloor) {
-                logger.info(String.format("Elevator [%s]  going down to floor [%s] from [%s] ", id, toFloor, currFloor));
-                currFloor--;
+            while(currentFloor > toFloor) {
+                logger.info(String.format("Elevator [%s]  going down to floor [%s] from [%s] ", id, toFloor, currentFloor));
+                delay();
+                currentFloor--;
             }
         }
 
-        logger.info(String.format("Elevator [%s] has reached destination [%s] ", id, currFloor));
+        logger.info(String.format("Elevator [%s] has reached destination [%s] ", id, currentFloor));
+        this.direction=Direction.NONE;
+        this.state=State.IDLE;
 
     }
 
+    /**
+     * Timed Waiting
+     */
+    private void delay() {
+        try {
+            Thread.sleep(MOVE_TIME);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isBusy() {
         if (!this.state.equals(State.IDLE)) {
@@ -91,23 +116,38 @@ public class ElevatorImpl implements Elevator, Runnable {
         }
     }
 
-    @Override
-    public int currentFloor() {
-        return currFloor;
-    }
-
+    /**
+     * Starting method on execution
+     */
     @Override
     public void run() {
-        logger.info(String.format("Elevator [%s] is available on floor [%s] ", id, currFloor));
+        logger.info(String.format("Elevator [%s] is available on floor [%s] ", id, currentFloor));
+        eventBus.register(this);
     }
 
-
+    /**
+     * Subscriber method for Elevator event
+     * @param event
+     */
     @Subscribe
-    public void getEvent(Elevator elevator){
-        System.out.println("Got Event");
-        if(elevator.getId()==this.getId()){
-            this.setState(elevator.getState());
+    public void onEvent(ElevatorEvent event){
+        logger.info(String.format("Elevator ID [%s] event for [%s] ", id, event.getElevatorId()));
+        if(this.id==event.getElevatorId()){
+            switch (event.getEventType()){
+                case RELEASE:
+                    this.state = State.IDLE;
+                    this.direction=Direction.NONE;
+                    break;
+                case ASSIGN:
+                    this.state = State.OCCUPIED;
+                    this.addressedFloor=event.getDestFloor();
+                    this.moveElevator(addressedFloor);
+                break;
+                default:
+                    logger.info("Not Supported Event");
+            }
         }
+
     }
 
 }

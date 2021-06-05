@@ -2,13 +2,15 @@ package com.tingco.codechallenge.elevator.resources;
 
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
-import com.tingco.codechallenge.elevator.api.impl.ElevatorControllerImpl;
 import com.tingco.codechallenge.elevator.api.util.ValidationUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -47,10 +49,17 @@ public final class ElevatorControllerEndPoints {
     }
 
     @RequestMapping(value = "/elevator", method = RequestMethod.GET)
-    public ResponseEntity<Elevator> requestElevator(@RequestParam(required = true) Integer toFloor) {
-        System.out.println("In requestElevator");
-        return new ResponseEntity<>(controller.requestElevator(toFloor), HttpStatus.OK);
+    public Object requestElevator(@RequestParam(required = true) Integer toFloor) {
+        if(!util.validateFloor(toFloor)){
+            return ResponseEntity.badRequest().build();
+        }
+        Elevator elevator = controller.requestElevator(toFloor);
+        if(elevator==null){
+            return ResponseEntity.accepted().body(null);
+        }
+        return ResponseEntity.ok(elevator);
     }
+
 
     @RequestMapping(value = "/release", method = RequestMethod.GET)
     public ResponseEntity<String> releaseElevator(@RequestParam(required = true) Integer id) {
@@ -60,7 +69,7 @@ public final class ElevatorControllerEndPoints {
         }
         List<Elevator> elevators = controller.getElevators();
         controller.releaseElevator(elevators.get(id));
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return ResponseEntity.ok("success");
     }
 
 }

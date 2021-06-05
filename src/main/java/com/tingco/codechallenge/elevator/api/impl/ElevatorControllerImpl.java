@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
 import com.tingco.codechallenge.elevator.api.beans.ElevatorEvent;
+import com.tingco.codechallenge.elevator.api.beans.EventType;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,25 +49,29 @@ public class ElevatorControllerImpl implements ElevatorController {
         Elevator nearest =null;
         for(int i=0;i<numberOfElevators;i++){
             Elevator current = elevators.get(i);
-            if(current.getState().equals(Elevator.State.IDLE)){
+            if(!current.isBusy()){
                 if(nearest==null){
                     nearest =current;
                     continue;
                 }
-                if(Math.abs(nearest.currentFloor()-toFloor)>Math.abs(current.currentFloor()-toFloor)){
+                if(Math.abs(nearest.getCurrentFloor()-toFloor)>Math.abs(current.getCurrentFloor()-toFloor)){
                     nearest =current;
                 }
             }
         }
         if(nearest !=null) {
             logger.info("Sending Elevator : "+ nearest.getId());
-            nearest.setState(Elevator.State.OCCUPIED);
-            nearest.moveElevator(toFloor);
+            ElevatorEvent event = new ElevatorEvent(nearest.getId(),toFloor, EventType.ASSIGN);
+            eventBus.post(event);
         } else {
             waitingPersons.add(toFloor);
         }
 
         return nearest;
+    }
+
+    public void takeElevator(int id, int destFloor){
+       //TODO: Take given elevator id to destination floor
     }
 
     @Scheduled(fixedRate = 1000)
@@ -78,12 +83,13 @@ public class ElevatorControllerImpl implements ElevatorController {
         }
     }
 
-
+    /**
+     *
+     */
     @PostConstruct
     public void initializeElevators(){
-        for(int i=1;i<=numberOfElevators;i++){
+        for(int i=0;i<numberOfElevators;i++){
             ElevatorImpl elevator= new ElevatorImpl(i,eventBus);
-            eventBus.register(elevator);
             executor.execute(elevator);
             elevators.add(elevator);
 
@@ -99,13 +105,10 @@ public class ElevatorControllerImpl implements ElevatorController {
     @Override
     public synchronized void releaseElevator(Elevator elevator) {
         logger.info("in releaseElevator");
-        elevator.setState(Elevator.State.IDLE);
-        eventBus.post(elevator);
-        System.out.println("Posted Event");
+        ElevatorEvent event = new ElevatorEvent(elevator.getId(), EventType.RELEASE);
+        eventBus.post(event);
+        System.out.println("Posted ElevatorEvent");
     }
 
-    @Subscribe
-    public void receiveEvent(Elevator elevator){
-        System.out.println("received Event");
-    }
+
 }

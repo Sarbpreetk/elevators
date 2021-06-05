@@ -18,11 +18,14 @@ public interface Elevator {
      * Enumeration for describing elevator's state.
      */
     enum State {
-        MOVING_UP, MOVING_DOWN,IDLE,OCCUPIED
+        MOVING_UP, MOVING_DOWN,IDLE,OCCUPIED,DOOR_CLOSED,DOOR_OPEN
     }
+    /**
+     * Tells the State of the Elevator.
+     *
+     * @return State Enumeration value describing the state.
+     */
     State getState();
-
-    void setState(State newState);
     /**
      * Tells which direction is the elevator going in.
      *
@@ -64,6 +67,7 @@ public interface Elevator {
      *
      * @return int actual floor at the moment.
      */
-    int currentFloor();
+    int getCurrentFloor();
+
 
 }
