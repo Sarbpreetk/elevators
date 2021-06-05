@@ -3,6 +3,7 @@ package com.tingco.codechallenge.elevator.api.impl;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.tingco.codechallenge.elevator.api.Elevator;
+import com.tingco.codechallenge.elevator.api.beans.ElevatorEvent;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,25 +62,23 @@ public class ElevatorImpl implements Elevator, Runnable {
 
     @Override
     public void moveElevator(int toFloor) {
-
         if (currFloor < toFloor) {
             this.direction = Direction.UP;
             this.state = State.MOVING_UP;
             while(currFloor < toFloor){
-                logger.info("Moving Up From: "+currFloor);
+                logger.info(String.format("Elevator [%s]  going up to floor [%s] from [%s] ", id, toFloor, currFloor));
                 currFloor++;
             }
         } else {
             this.direction = Direction.DOWN;
             this.state = State.MOVING_DOWN;
             while(currFloor < toFloor) {
-                logger.info("Moving Down From: " + currFloor);
+                logger.info(String.format("Elevator [%s]  going down to floor [%s] from [%s] ", id, toFloor, currFloor));
                 currFloor--;
             }
-            logger.info("Reached Destination: "+currFloor);
         }
 
-
+        logger.info(String.format("Elevator [%s] has reached destination [%s] ", id, currFloor));
 
     }
 
@@ -99,19 +98,10 @@ public class ElevatorImpl implements Elevator, Runnable {
 
     @Override
     public void run() {
-        move();
+        logger.info(String.format("Elevator [%s] is available on floor [%s] ", id, currFloor));
     }
 
-    public void move() {
-        System.out.println("READY");
-        if (direction.equals(Direction.UP)) {
-            currFloor++;
-            System.out.println("Going Up" + currFloor);
-        } else if (direction.equals(Direction.DOWN)) {
-            currFloor--;
 
-        }
-    }
     @Subscribe
     public void getEvent(Elevator elevator){
         System.out.println("Got Event");
@@ -119,4 +109,5 @@ public class ElevatorImpl implements Elevator, Runnable {
             this.setState(elevator.getState());
         }
     }
+
 }

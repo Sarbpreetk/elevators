@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
+import com.tingco.codechallenge.elevator.api.beans.ElevatorEvent;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,10 +59,9 @@ public class ElevatorControllerImpl implements ElevatorController {
             }
         }
         if(nearest !=null) {
+            logger.info("Sending Elevator : "+ nearest.getId());
             nearest.setState(Elevator.State.OCCUPIED);
             nearest.moveElevator(toFloor);
-            System.out.println("Nearest Elevator is" + nearest.getId());
-            logger.info("Sending Elevator : "+ nearest.getId());
         } else {
             waitingPersons.add(toFloor);
         }
@@ -81,7 +81,7 @@ public class ElevatorControllerImpl implements ElevatorController {
 
     @PostConstruct
     public void initializeElevators(){
-        for(int i=0;i<numberOfElevators;i++){
+        for(int i=1;i<=numberOfElevators;i++){
             ElevatorImpl elevator= new ElevatorImpl(i,eventBus);
             eventBus.register(elevator);
             executor.execute(elevator);
