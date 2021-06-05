@@ -93,7 +93,7 @@ public class ElevatorImpl implements Elevator, Runnable {
     }
 
     /**
-     * Timed Waiting
+     * Timed Delay
      */
     private void delay() {
         try {

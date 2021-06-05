@@ -36,7 +36,6 @@ public class ElevatorApplication {
      */
     public static void main(final String[] args) {
         SpringApplication.run(ElevatorApplication.class, args);
-        System.out.println("Started");
     }
 
     /**
