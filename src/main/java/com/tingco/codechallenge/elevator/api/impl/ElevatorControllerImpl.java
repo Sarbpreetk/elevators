@@ -64,7 +64,7 @@ public class ElevatorControllerImpl implements ElevatorController {
                 int nearestDistance = Math.abs(nearest.getCurrentFloor()-toFloor);
                 int currentDistance = Math.abs(current.getCurrentFloor()-toFloor);
                 if(nearestDistance > currentDistance){
-                    nearest =current;
+                    nearest = current;
                 }
             }
         }

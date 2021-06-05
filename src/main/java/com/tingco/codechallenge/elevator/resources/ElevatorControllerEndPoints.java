@@ -3,6 +3,7 @@ package com.tingco.codechallenge.elevator.resources;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
 import com.tingco.codechallenge.elevator.api.util.ValidationUtil;
+import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public final class ElevatorControllerEndPoints {
 
         return "pong";
     }
-
+    @ApiOperation(value = "Get All Elevators", notes = "This method returns all Elevators and their details")
     @RequestMapping(value = "/elevators", method = RequestMethod.GET)
     public List<Elevator> getElevators() {
             return controller.getElevators();
@@ -51,6 +52,7 @@ public final class ElevatorControllerEndPoints {
      * @param toFloor
      * @return
      */
+    @ApiOperation(value = "Request Elevator", notes = "This method places request for elevator to given floor")
     @RequestMapping(value = "/elevator", method = RequestMethod.GET)
     public Object requestElevator(@RequestParam(required = true) Integer toFloor) {
         if(!util.validateFloor(toFloor)){
@@ -70,6 +72,7 @@ public final class ElevatorControllerEndPoints {
      * @param id
      * @return
      */
+    @ApiOperation(value = "Release a elevator", notes = "This method will release elevator with given id.")
     @RequestMapping(value = "/release", method = RequestMethod.GET)
     public ResponseEntity<String> releaseElevator(@RequestParam(required = true) Integer id) {
         if(!util.validateId(id)){

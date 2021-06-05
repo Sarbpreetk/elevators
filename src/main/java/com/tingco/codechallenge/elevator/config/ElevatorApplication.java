@@ -9,6 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -18,6 +24,7 @@ import java.util.concurrent.Executors;
  *
  */
 @SpringBootApplication
+@EnableSwagger2
 @ComponentScan(basePackages = { "com.tingco.codechallenge.elevator" })
 @PropertySources({ @PropertySource("classpath:application.properties") })
 public class ElevatorApplication {
@@ -52,7 +59,26 @@ public class ElevatorApplication {
      */
     @Bean
     public EventBus eventBus() {
+
         return new AsyncEventBus(Executors.newCachedThreadPool());
+    }
+    @Bean
+    public Docket productApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select().apis(RequestHandlerSelectors.basePackage("com.tingco.codechallenge.elevator"))
+                .build();
+    }
+
+    private ApiInfo metaData() {
+        ApiInfo apiInfo = new ApiInfo(
+                "Elevator API",
+                "",
+                "1.0",
+                "Terms of service",
+                new Contact("Skaur", "", ""),
+                "Protected for Sarbpreetk",
+                "https://");
+        return apiInfo;
     }
 
 }

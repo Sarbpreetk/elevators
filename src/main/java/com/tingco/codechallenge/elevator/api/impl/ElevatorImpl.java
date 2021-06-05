@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class ElevatorImpl implements Elevator, Runnable {
 
     private static final Logger logger = Logger.getLogger(ElevatorImpl.class);
-    private static final int MOVE_TIME = 2000;
+    private static final int MOVE_TIME = 1000;
     private int id;
     private int currentFloor;
     private Direction direction;
