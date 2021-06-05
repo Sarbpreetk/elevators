@@ -19,6 +19,11 @@ public class ValidationUtil {
     @Value("${com.tingco.elevator.numberofelevators}")
     private int numberOfElevators;
 
+    /**
+     * To Check floor is in range of Start and End Floor
+     * @param toFloor
+     * @return
+     */
     public boolean validateFloor(int toFloor){
         if (toFloor < startFoor || toFloor >endFloor) {
             logger.error("Not valid Floor: "+toFloor);
@@ -27,6 +32,11 @@ public class ValidationUtil {
         return Boolean.TRUE;
     }
 
+    /**
+     * To Check if it is a valid elevator id.
+     * @param id
+     * @return
+     */
     public boolean validateId(int id){
         if (id < 0 || id >=numberOfElevators) {
             logger.error("Not valid Elevator id : "+id);

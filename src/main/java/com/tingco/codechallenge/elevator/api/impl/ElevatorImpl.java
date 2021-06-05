@@ -131,7 +131,7 @@ public class ElevatorImpl implements Elevator, Runnable {
      */
     @Subscribe
     public void onEvent(ElevatorEvent event){
-        logger.info(String.format("Elevator ID [%s] event for [%s] ", id, event.getElevatorId()));
+        logger.debug(String.format("Elevator ID [%s] event for ID [%s] ", id, event.getElevatorId()));
         if(this.id==event.getElevatorId()){
             switch (event.getEventType()){
                 case RELEASE:

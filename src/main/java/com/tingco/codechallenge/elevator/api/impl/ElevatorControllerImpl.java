@@ -5,7 +5,6 @@ import com.google.common.eventbus.Subscribe;
 import com.tingco.codechallenge.elevator.api.Elevator;
 import com.tingco.codechallenge.elevator.api.ElevatorController;
 import com.tingco.codechallenge.elevator.api.beans.ElevatorEvent;
-import com.tingco.codechallenge.elevator.api.beans.ElevatorRequest;
 import com.tingco.codechallenge.elevator.api.beans.EventType;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ public class ElevatorControllerImpl implements ElevatorController {
     private List<Elevator> elevators = new ArrayList<>();
 
     private Queue<Integer> waitingPersons = new LinkedList<>();
-
 
     @Autowired
     private Executor executor;
@@ -59,6 +57,8 @@ public class ElevatorControllerImpl implements ElevatorController {
             ElevatorEvent event = new ElevatorEvent(nearest.getId(),toFloor, EventType.ASSIGN);
             eventBus.post(event);
         } else {
+            if(!waitingPersons.contains(toFloor))
+                logger.info("Add to Waiting Queue - floor : "+ toFloor);
             waitingPersons.add(toFloor);
         }
 
@@ -69,20 +69,23 @@ public class ElevatorControllerImpl implements ElevatorController {
        //TODO: Take given elevator id to destination floor
     }
 
+    /**
+     * Scheduled Method to request Elevator for persons waiting in Queue
+     */
     @Scheduled(fixedRate = 1000)
     public void getFromQueue(){
         if(!waitingPersons.isEmpty()){
            int reqFloor= waitingPersons.peek();
-            logger.info("Requesting for waiting person at floor : "+ reqFloor);
-            Elevator elevator = requestElevator(reqFloor);
+           logger.info("Requesting for waiting person at floor : "+ reqFloor);
+           Elevator elevator = requestElevator(reqFloor);
            if(elevator!=null){
-                waitingPersons.poll();
+               waitingPersons.poll();
            }
         }
     }
 
     /**
-     *
+     * Initialize all elevators
      */
     @PostConstruct
     public void initializeElevators(){
@@ -94,15 +97,24 @@ public class ElevatorControllerImpl implements ElevatorController {
         }
 
     }
+
+    /**
+     * Get all elevators
+     * @return
+     */
     @Override
     public List<Elevator> getElevators() {
         logger.info("Returning List of Elevators");
         return Collections.unmodifiableList(elevators);
     }
 
+    /**
+     * Release Elevator
+     * @param elevator
+     */
     @Override
     public synchronized void releaseElevator(Elevator elevator) {
-        logger.info("in releaseElevator");
+        logger.info("In releaseElevator");
         ElevatorEvent event = new ElevatorEvent(elevator.getId(), EventType.RELEASE);
         eventBus.post(event);
     }

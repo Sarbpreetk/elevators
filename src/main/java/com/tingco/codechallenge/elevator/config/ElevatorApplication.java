@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +20,8 @@ import com.google.common.eventbus.EventBus;
  * Preconfigured Spring Application boot class.
  *
  */
-@Configuration
+@SpringBootApplication
 @ComponentScan(basePackages = { "com.tingco.codechallenge.elevator" })
-@EnableAutoConfiguration
 @PropertySources({ @PropertySource("classpath:application.properties") })
 public class ElevatorApplication {
 
