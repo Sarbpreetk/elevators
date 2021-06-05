@@ -63,7 +63,7 @@ public final class ElevatorControllerEndPoints {
     public Object requestElevator(@RequestParam(required = true) Integer toFloor) {
         if(!util.validateFloor(toFloor)){
             logger.error("Input Floor is invalid");
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
         Elevator elevator = controller.requestElevator(toFloor);
         if(elevator==null){
