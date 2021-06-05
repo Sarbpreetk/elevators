@@ -18,10 +18,10 @@ POST /release - To release elevator
 #Configuration settings:
 application.properties - contains the number of floors, start and end floor.
 
-¤Assumption:
+#Assumption:
 All elevator to go all floors.
 
-¤How to access endpoints
+#How to access endpoints
 Swagger UI:
 http://localhost:8080/swagger-ui.html#/elevator-controller-end-points
 
