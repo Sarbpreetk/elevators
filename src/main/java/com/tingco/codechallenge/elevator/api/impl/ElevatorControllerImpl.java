@@ -37,6 +37,20 @@ public class ElevatorControllerImpl implements ElevatorController {
     private EventBus eventBus;
 
 
+    /**
+     * Initialize all elevators
+     */
+    @PostConstruct
+    public void initializeElevators(){
+        for(int i=0;i<numberOfElevators;i++){
+            ElevatorImpl elevator= new ElevatorImpl(i,eventBus);
+            executor.execute(elevator);
+            elevators.add(elevator);
+
+        }
+    }
+
+
     @Override
     public synchronized Elevator requestElevator(int toFloor) {
         logger.info("Received Request for Floor: "+ toFloor);
@@ -47,7 +61,9 @@ public class ElevatorControllerImpl implements ElevatorController {
                     nearest = current;
                     continue;
                 }
-                if(Math.abs(nearest.getCurrentFloor()-toFloor)>Math.abs(current.getCurrentFloor()-toFloor)){
+                int nearestDistance = Math.abs(nearest.getCurrentFloor()-toFloor);
+                int currentDistance = Math.abs(current.getCurrentFloor()-toFloor);
+                if(nearestDistance > currentDistance){
                     nearest =current;
                 }
             }
@@ -58,10 +74,9 @@ public class ElevatorControllerImpl implements ElevatorController {
             eventBus.post(event);
         } else {
             if(!waitingPersons.contains(toFloor))
-                logger.info("Add to Waiting Queue - floor : "+ toFloor);
-            waitingPersons.add(toFloor);
+                logger.info("ADD TO WAITING QUEUE - floor : "+ toFloor);
+                waitingPersons.add(toFloor);
         }
-
         return nearest;
     }
 
@@ -84,34 +99,15 @@ public class ElevatorControllerImpl implements ElevatorController {
         }
     }
 
-    /**
-     * Initialize all elevators
-     */
-    @PostConstruct
-    public void initializeElevators(){
-        for(int i=0;i<numberOfElevators;i++){
-            ElevatorImpl elevator= new ElevatorImpl(i,eventBus);
-            executor.execute(elevator);
-            elevators.add(elevator);
 
-        }
 
-    }
-
-    /**
-     * Get all elevators
-     * @return
-     */
     @Override
     public List<Elevator> getElevators() {
         logger.info("Returning List of Elevators");
         return Collections.unmodifiableList(elevators);
     }
 
-    /**
-     * Release Elevator
-     * @param elevator
-     */
+
     @Override
     public synchronized void releaseElevator(Elevator elevator) {
         logger.info("In releaseElevator");

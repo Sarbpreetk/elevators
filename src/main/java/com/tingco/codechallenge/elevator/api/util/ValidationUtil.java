@@ -1,6 +1,5 @@
 package com.tingco.codechallenge.elevator.api.util;
 
-import com.tingco.codechallenge.elevator.api.impl.ElevatorControllerImpl;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
